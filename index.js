@@ -5,7 +5,7 @@ const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 
 const app = express();
-app.use(express.json())
+app.use(express.json()) // as the request is comming is a json object we need to parse
 
 const dbPath = path.join(__dirname, "goodreads.db");
 
