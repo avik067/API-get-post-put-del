@@ -5,7 +5,7 @@ const { open } = require("sqlite"); // we are destructuring this open method fro
 const sqlite3 = require("sqlite3");
 
 const app = express();
-app.use(express.json()) // as the request is comming is a json object we need to parse
+app.use(express.json()) // as the request is comming is a json string object we need to parse
 
 const dbPath = path.join(__dirname, "goodreads.db");
 
@@ -28,8 +28,8 @@ const initializeDBAndServer = async () => {
 initializeDBAndServer();
 
 // Get Books API
-app.get("/books/:bookId/", async (request, response) => {
-  const { bookId } = request.params;
+app.get("/books/:bookId/", async (request, response) => { // : symbol is not present in actual URL just for
+  const { bookId } = request.params;  // pick up the path parameter with .params
   const getBookQuery = `
     SELECT
       *
@@ -37,8 +37,8 @@ app.get("/books/:bookId/", async (request, response) => {
       book
     WHERE
       book_id = ${bookId};`;
-  const book = await db.get(getBookQuery);
-  response.send(book);
+  const book = await db.get(getBookQuery); // .get() method to get a single row from the table 
+  response.send(book);              // .all() for multiple row from the table 
 });
 
 // Add Book API 
@@ -77,13 +77,13 @@ app.post("/books/", async (request, response) => {
 
   const dbResponse = await db.run(addBookQuery); //. run() for create otr update table data on database
   const bookId = dbResponse.lastID; // .lastId gives the primary key of the  the inserted row
-  response.send({ bookId: bookId });
+  response.send({ bookId: bookId }); 
 });
 
 
 // Update Book API 
 
-app.put("/books/:bookId/", async (request, response) => {
+app.put("/books/:bookId/", async (request, response) => {  // : symbol is not present in actual URL just for
   const { bookId } = request.params;  // Extracting book id from request parameter :bookId/ in path previous line
   const bookDetails = request.body;
   const {
@@ -116,7 +116,7 @@ app.put("/books/:bookId/", async (request, response) => {
       online_stores='${onlineStores}'
     WHERE
       book_id = ${bookId};`;
-  await db.run(updateBookQuery);
+  await db.run(updateBookQuery); // .run() method is used to crete or update table data is the database 
   response.send("Book Updated Successfully");
 });
 
@@ -137,8 +137,8 @@ app.delete("/books/:bookId/", async (request, response) => {
 
 // Get Author Books API
 
-app.get("/authors/:authorId/books/", async (request, response) => {
-  const { authorId } = request.params;
+app.get("/authors/:authorId/books/", async (request, response) => { // : symbol is not present in actual URL just for
+  const { authorId } = request.params;  // just indentify the path para meter with .params
   const getAuthorBooksQuery = `
     SELECT
      *
