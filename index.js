@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 
-const { open } = require("sqlite");
+const { open } = require("sqlite"); // we are destructuring this open method from sqlite package
 const sqlite3 = require("sqlite3");
 
 const app = express();
@@ -13,8 +13,8 @@ let db = null;
 
 const initializeDBAndServer = async () => {
   try {
-    db = await open({
-      filename: dbPath,
+    db = await open({ //open() method is used to connect the database server and provides a connection- 
+      filename: dbPath,    // -object to operate on the database.
       driver: sqlite3.Database,
     });
     app.listen(3000, () => {
@@ -28,22 +28,23 @@ const initializeDBAndServer = async () => {
 initializeDBAndServer();
 
 // Get Books API
-app.get("/books/", async (request, response) => {
-  const getBooksQuery = `
+app.get("/books/:bookId/", async (request, response) => {
+  const { bookId } = request.params;
+  const getBookQuery = `
     SELECT
       *
     FROM
       book
-    ORDER BY
-      book_id;`;
-  const booksArray = await db.all(getBooksQuery);
-  response.send(booksArray);
+    WHERE
+      book_id = ${bookId};`;
+  const book = await db.get(getBookQuery);
+  response.send(book);
 });
 
 // Add Book API 
 app.post("/books/", async (request, response) => {
   const bookDetails = request.body; // this request is comming from goodreads.db go there and check the object
-  const {
+  const {                          // .body gives the body of the request object
     title,
     authorId,
     rating,
@@ -75,7 +76,7 @@ app.post("/books/", async (request, response) => {
       );`;
 
   const dbResponse = await db.run(addBookQuery); //. run() for create otr update table data on database
-  const bookId = dbResponse.lastID;
+  const bookId = dbResponse.lastID; // .lastId gives the primary key of the  the inserted row
   response.send({ bookId: bookId });
 });
 
@@ -83,7 +84,7 @@ app.post("/books/", async (request, response) => {
 // Update Book API 
 
 app.put("/books/:bookId/", async (request, response) => {
-  const { bookId } = request.params;
+  const { bookId } = request.params;  // Extracting book id from request parameter :bookId/ in path previous line
   const bookDetails = request.body;
   const {
     title,
